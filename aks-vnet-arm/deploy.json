@@ -24,6 +24,13 @@
     "variables": {
         "Network Contributor Role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
         "VNET Name": "cluster-vnet",
+        "VNET Address Space": "172.16.0.0/18",
+        "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
+        "AKS Subnet Address Space": "172.16.0.0/20",
+        "Service Subnet Address Space": "172.16.16.0/20",
+        "Service Cidr": "10.0.0.0/16",
+        "Dns Service IP": "10.0.0.0",
+        "Docker Bridge Cidr": "10.2.0.1/16",
         "kubernetes version": "1.11.1",
         "dnsPrefix": "vpl-cluster",
         "VM Size": "Standard_B2ms",
@@ -40,33 +47,37 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "172.16.0.0/18"
+                        "[variables('VNET Address Space')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "aks",
                         "properties": {
-                            "addressPrefix": "172.16.0.0/20"
+                            "addressPrefix": "[variables('AKS Subnet Address Space')]"
+                        }
+                    },
+                    {
+                        "name": "services",
+                        "properties": {
+                            "addressPrefix": "[variables('Service Subnet Address Space')]"
                         }
                     }
                 ]
             },
-            "resources": [
-                {
-                    "type": "Microsoft.Authorization/roleAssignments",
-                    "apiVersion": "2017-09-01",
-                    "name": "[guid(subscription().subscriptionId)]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
-                    ],
-                    "properties": {
-                        "roleDefinitionId": "[variables('Network Contributor Role')]",
-                        "principalId": "[parameters('Service Principal Object ID')]",
-                        "scope": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
-                    }
-                }
-            ]
+            "resources": []
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/providers/roleAssignments",
+            "apiVersion": "2017-05-01",
+            "name": "[variables('Role Assignment Name')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('Network Contributor Role')]",
+                "principalId": "[parameters('Service Principal Object ID')]"
+            }
         },
         {
             "type": "Microsoft.ContainerService/managedClusters",
@@ -106,10 +117,9 @@
                 },
                 "networkProfile": {
                     "networkPlugin": "azure",
-                    "podCidr": "172.16.0.0/21",
-                    "serviceCidr": "172.16.8.0/22",
-                    "dnsServiceIP": "172.16.8.0",
-                    "dockerBridgeCidr": "172.17.0.1/16"
+                    "serviceCidr": "[variables('Service Cidr')]",
+                    "dnsServiceIP": "[variables('Dns Service IP')]",
+                    "dockerBridgeCidr": "[variables('Docker Bridge Cidr')]"
                 }
             }
         }
