@@ -35,7 +35,7 @@
         "AKS Subnet Address Space": "172.16.0.0/20",
         "Service Subnet Address Space": "172.16.16.0/20",
         "Service Cidr": "10.0.0.0/16",
-        "Dns Service IP": "10.0.0.0",
+        "Dns Service IP": "10.0.0.10",
         "Docker Bridge Cidr": "10.2.0.1/16",
         "kubernetes version": "1.11.1",
         "VM Size": "Standard_B2ms",
@@ -95,6 +95,11 @@
             "properties": {
                 "kubernetesVersion": "[variables('kubernetes version')]",
                 "dnsPrefix": "[parameters('DNS Prefix')]",
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": true
+                    }
+                },
                 "servicePrincipalProfile": {
                     "clientId": "[parameters('Service Principal App ID')]",
                     "secret": "[parameters('Service Principal Secret')]"
