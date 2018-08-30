@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "DNS Prefix": {
+            "metadata": {
+                "description": "DNS Prefix for the cluster"
+            },
+            "type": "string"
+        },
+        "Service Principal App ID": {
+            "metadata": {
+                "description": "App ID of the Service Principal"
+            },
+            "type": "string"
+        },
+        "Service Principal Object ID": {
+            "metadata": {
+                "description": "Object ID of the Service Principal"
+            },
+            "type": "string"
+        },
+        "Service Principal Secret": {
+            "metadata": {
+                "description": "Secret of the Service Principal"
+            },
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "Network Contributor Role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
+        "VNET Name": "cluster-vnet",
+        "VNET Address Space": "172.16.0.0/18",
+        "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
+        "AKS Subnet Address Space": "172.16.0.0/20",
+        "Service Subnet Address Space": "172.16.16.0/20",
+        "Service Cidr": "10.0.0.0/16",
+        "Dns Service IP": "10.0.0.10",
+        "Docker Bridge Cidr": "10.2.0.1/16",
+        "kubernetes version": "1.11.1",
+        "VM Size": "Standard_B2ms",
+        "instance count": 3,
+        "ssh public key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/DWLnsCzgNo4rXoafDwXRjXBCIyX8m6sPJRVfDSmYgND739wQsfBF/B8RCyU1z+tjmOr+CZYCu6w2FmVL8JDY/aPJC9nDtO5aZSZtAdKJH51PwODsI8E4mthPuC01CxRageEDeEW9u4CCu3HXq6gFBscOEsC1iTYO5gsaxotiGdJS2pYnNHDVTWqhbzi7UPx8xPKJ1M8LKkG2paZLYBHKIhjrxjrAjnnsLkFb/dhfdr9D65Mqf5OGy40X1vQv+rfbLtnpb1DMajlfwQtBQpHY2SnEFbSwQva/l/chyhc4b854Uhpc1XdkIcQYiz7pRagRsJ1u5lMusCAsE5gnGoEJ vplauzon@MININT-BK6A5VR"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-10-01",
+            "name": "[variables('VNet Name')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('VNET Address Space')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "aks",
+                        "properties": {
+                            "addressPrefix": "[variables('AKS Subnet Address Space')]"
+                        }
+                    },
+                    {
+                        "name": "services",
+                        "properties": {
+                            "addressPrefix": "[variables('Service Subnet Address Space')]"
+                        }
+                    }
+                ]
+            },
+            "resources": []
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/providers/roleAssignments",
+            "apiVersion": "2017-05-01",
+            "name": "[variables('Role Assignment Name')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('Network Contributor Role')]",
+                "principalId": "[parameters('Service Principal Object ID')]"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "name": "cluster",
+            "apiVersion": "2018-03-31",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
+            ],
+            "properties": {
+                "kubernetesVersion": "[variables('kubernetes version')]",
+                "dnsPrefix": "[parameters('DNS Prefix')]",
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": true
+                    }
+                },
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('Service Principal App ID')]",
+                    "secret": "[parameters('Service Principal Secret')]"
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "count": "[variables('instance count')]",
+                        "vmSize": "[variables('VM Size')]",
+                        "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VNET Name'), 'aks')]",
+                        "maxPods": 30,
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks"
+                    }
+                ],
+                "linuxProfile": {
+                    "adminUsername": "hidden-admin",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[variables('ssh public key')]"
+                            }
+                        ]
+                    }
+                },
+                "networkProfile": {
+                    "networkPlugin": "azure",
+                    "serviceCidr": "[variables('Service Cidr')]",
+                    "dnsServiceIP": "[variables('Dns Service IP')]",
+                    "dockerBridgeCidr": "[variables('Docker Bridge Cidr')]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference('cluster').fqdn]"
+        }
+    }
+}
