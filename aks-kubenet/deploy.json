@@ -25,6 +25,16 @@
                 "description": "Secret of the Service Principal"
             },
             "type": "securestring"
+        },
+        "Network Plugin": {
+            "metadata": {
+                "description": "Kubernetes Network Plugin"
+            },
+            "allowedValues": [
+                "kubenet",
+                "azure"
+            ],
+            "type": "string"
         }
     },
     "variables": {
@@ -126,7 +136,7 @@
                     }
                 },
                 "networkProfile": {
-                    "networkPlugin": "azure",
+                    "networkPlugin": "[parameters('Network Plugin')]",
                     "serviceCidr": "[variables('Service Cidr')]",
                     "dnsServiceIP": "[variables('Dns Service IP')]",
                     "dockerBridgeCidr": "[variables('Docker Bridge Cidr')]"
