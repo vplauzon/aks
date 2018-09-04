@@ -140,7 +140,6 @@
                 },
                 "networkProfile": {
                     "networkPlugin": "[parameters('Network Plugin')]",
-                    "podCidr":"[variables('Pod Cidr')]",
                     "serviceCidr": "[variables('Service Cidr')]",
                     "dnsServiceIP": "[variables('Dns Service IP')]",
                     "dockerBridgeCidr": "[variables('Docker Bridge Cidr')]"
