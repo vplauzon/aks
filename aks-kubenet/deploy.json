@@ -40,14 +40,15 @@
     },
     "variables": {
         "isKubenet": "[equals(parameters('Network Plugin'), 'kubenet')]",
+        "Max Pods": 200,
         "Network Contributor Role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
         "VNET Name": "cluster-vnet",
         "VNET Address Space": "172.16.0.0/18",
         "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
         "AKS Subnet Address Space": "172.16.0.0/20",
         "Service Subnet Address Space": "172.16.16.0/20",
-        "Pod Cidr" :"[if(variables('isKubenet'), '10.16.0.1/16', '')]",
-        "Service Cidr": "10.0.0.0/16",
+        "Pod Cidr": "[if(variables('isKubenet'), '10.16.0.1/16', '')]",
+        "Cluster-IPs Service Cidr": "10.0.0.0/16",
         "Dns Service IP": "10.0.0.10",
         "Docker Bridge Cidr": "10.2.0.1/16",
         "kubernetes version": "1.11.1",
@@ -123,7 +124,7 @@
                         "count": "[variables('instance count')]",
                         "vmSize": "[variables('VM Size')]",
                         "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VNET Name'), 'aks')]",
-                        "maxPods": 30,
+                        "maxPods": "[variables('Max Pods')]",
                         "osType": "Linux",
                         "storageProfile": "ManagedDisks"
                     }
@@ -140,8 +141,8 @@
                 },
                 "networkProfile": {
                     "networkPlugin": "[parameters('Network Plugin')]",
-                    "podCidr":"[variables('Pod Cidr')]",
-                    "serviceCidr": "[variables('Service Cidr')]",
+                    "podCidr": "[variables('Pod Cidr')]",
+                    "serviceCidr": "[variables('Cluster-IPs Service Cidr')]",
                     "dnsServiceIP": "[variables('Dns Service IP')]",
                     "dockerBridgeCidr": "[variables('Docker Bridge Cidr')]"
                 }
