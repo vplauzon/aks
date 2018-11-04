@@ -1,93 +1,94 @@
-# Offers deployment
+# Bikes deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pizza-offers-deploy
+  name: bikes-deploy
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app:  pizza-offers
+      app:  bikes-offers
   template:
     metadata:
       labels:
-        app: pizza-offers
+        app: bikes-offers
     spec:
       containers:
       - name: myapp
         image: vplauzon/get-started:part2-no-redis
         env:
         - name:  NAME
-          value: pizza-offers
+          value: bikes
         ports:
         - containerPort: 80
 ---
-# Offers Service
+# Bikes Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: pizza-offers-svc
+  name: bikes-svc
 spec:
   type: ClusterIP
   ports:
   - port: 80
   selector:
-    app: pizza-offers
+    app: bikes
 ---
-# Menu deployment
+# Cars deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pizza-menu-deploy
+  name: cars-deploy
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app:  pizza-menu
+      app:  cars
   template:
     metadata:
       labels:
-        app: pizza-menu
+        app: cars
     spec:
       containers:
       - name: myapp
         image: vplauzon/get-started:part2-no-redis
         env:
         - name:  NAME
-          value: pizza-menu
+          value: cars
         ports:
         - containerPort: 80
 ---
-# Menu Service
+# Cars Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: pizza-menu-svc
+  name: cars-svc
 spec:
   type: ClusterIP
   ports:
   - port: 80
   selector:
-    app: pizza-menu
+    app: cars
 ---
-# Url Based Routing Ingress
+# Domain name overload Ingress
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: url-routing-ingress
+  name: domain-name-overload-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: vincentpizza.eastus2.cloudapp.azure.com
+  - host: bikes.eastus2.cloudapp.azure.com
     http:
       paths:
-      - path: /pizza-offers
-        backend:
-          serviceName: pizza-offers-svc
+      - backend:
+          serviceName: bikes-svc
           servicePort: 80
-      - path: /menu
-        backend:
-          serviceName: pizza-menu-svc
+  - host: cars.eastus2.cloudapp.azure.com
+    http:
+      paths:
+      - backend:
+          serviceName: cars-svc
           servicePort: 80
