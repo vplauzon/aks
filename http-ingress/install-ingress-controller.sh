@@ -1,0 +1,1 @@
+helm install stable/nginx-ingress --namespace kube-system --set controller.replicaCount=2 --set rbac.create=false

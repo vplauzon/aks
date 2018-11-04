@@ -1,0 +1,93 @@
+# Offers deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizza-offers-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  pizza-offers
+  template:
+    metadata:
+      labels:
+        app: pizza-offers
+    spec:
+      containers:
+      - name: myapp
+        image: vplauzon/get-started:part2-no-redis
+        env:
+        - name:  NAME
+          value: pizza-offers
+        ports:
+        - containerPort: 80
+---
+# Offers Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pizza-offers-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: pizza-offers
+---
+# Menu deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizza-menu-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  pizza-menu
+  template:
+    metadata:
+      labels:
+        app: pizza-menu
+    spec:
+      containers:
+      - name: myapp
+        image: vplauzon/get-started:part2-no-redis
+        env:
+        - name:  NAME
+          value: pizza-menu
+        ports:
+        - containerPort: 80
+---
+# Menu Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pizza-menu-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: pizza-menu
+---
+# Url Based Routing Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-world-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: vincentpizza.eastus2.cloudapp.azure.com
+    http:
+      paths:
+      - path: /pizza-offers
+        backend:
+          serviceName: pizza-offers-svc
+          servicePort: 80
+      - path: /menu
+        backend:
+          serviceName: pizza-menu-svc
+          servicePort: 80
