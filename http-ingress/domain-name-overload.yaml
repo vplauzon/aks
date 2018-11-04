@@ -7,11 +7,11 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app:  bikes-offers
+      app:  bikes
   template:
     metadata:
       labels:
-        app: bikes-offers
+        app: bikes
     spec:
       containers:
       - name: myapp
