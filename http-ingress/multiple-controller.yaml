@@ -1,0 +1,180 @@
+# Blue deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  blue
+  template:
+    metadata:
+      labels:
+        app: blue
+    spec:
+      containers:
+      - name: myapp
+        image: vplauzon/get-started:part2-no-redis
+        env:
+        - name:  NAME
+          value: Blue-Pod
+        ports:
+        - containerPort: 80
+---
+# Blue Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: blue
+# White deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: white-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  white
+  template:
+    metadata:
+      labels:
+        app: white
+    spec:
+      containers:
+      - name: myapp
+        image: vplauzon/get-started:part2-no-redis
+        env:
+        - name:  NAME
+          value: White-Pod
+        ports:
+        - containerPort: 80
+---
+# White Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: white-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: white
+# Red deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: red-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app:  red
+  template:
+    metadata:
+      labels:
+        app: red
+    spec:
+      containers:
+      - name: myapp
+        image: vplauzon/get-started:part2-no-redis
+        env:
+        - name:  NAME
+          value: Red-Pod
+        ports:
+        - containerPort: 80
+---
+# Red Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: red-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: red
+---
+# First Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: first-ingress
+  annotations:
+    kubernetes.io/ingress.class: first
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /1-blue
+        backend:
+          serviceName: blue-svc
+          servicePort: 80
+      - path: /1-white
+        backend:
+          serviceName: white-svc
+          servicePort: 80
+      - path: /1-red
+        backend:
+          serviceName: white-svc
+          servicePort: 80
+---
+# Second Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: second-ingress
+  annotations:
+    kubernetes.io/ingress.class: second
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /2-blue
+        backend:
+          serviceName: blue-svc
+          servicePort: 80
+      - path: /2-white
+        backend:
+          serviceName: white-svc
+          servicePort: 80
+      - path: /2-red
+        backend:
+          serviceName: white-svc
+          servicePort: 80
+---
+# Third Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: third-ingress
+  annotations:
+    kubernetes.io/ingress.class: third
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /3-blue
+        backend:
+          serviceName: blue-svc
+          servicePort: 80
+      - path: /3-white
+        backend:
+          serviceName: white-svc
+          servicePort: 80
+      - path: /3-red
+        backend:
+          serviceName: white-svc
+          servicePort: 80
