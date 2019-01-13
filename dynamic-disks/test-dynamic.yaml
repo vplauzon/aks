@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: disk-stateful-set
+  labels:
+    app: disk-full
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: disk-pod
+  serviceName:  stateful-disk-set
+  template:
+    metadata:
+      labels:
+        app: disk-pod
+    spec:
+      containers:
+      - name:  busy
+        image: busybox
+        args:
+        - /bin/sh
+        - -c
+        - >
+          i=0;
+          while true;
+          do
+            echo "$i: $(date)" >> /buffer/log.log;
+            i=$((i+1));
+            sleep 1;
+          done
+        volumeMounts:
+        - name: azure-managed-disk-set
+          mountPath: /buffer
+  volumeClaimTemplates:
+  - metadata:
+      name: azure-managed-disk-set
+    spec:
+      storageClassName: managed-premium
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 25Gi
