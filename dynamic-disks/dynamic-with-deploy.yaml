@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name:  busy
-        image: vplauzon/get-started
+        image: vplauzon/get-started:part2-no-redis
         ports:
         - containerPort: 80
         volumeMounts:
