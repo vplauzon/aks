@@ -21,11 +21,11 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: azure-managed-disk-set
+        - name: azure-managed-disk-stateful
           mountPath: /buffer
   volumeClaimTemplates:
   - metadata:
-      name: azure-managed-disk-set
+      name: azure-managed-disk-stateful
     spec:
       storageClassName: managed-premium
       accessModes:
