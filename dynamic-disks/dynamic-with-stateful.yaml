@@ -3,32 +3,23 @@ kind: StatefulSet
 metadata:
   name: disk-stateful-set
   labels:
-    app: disk-full
+    app: busy-box-with-stateful-set-disk
 spec:
-  replicas: 4
+  replicas: 5
   selector:
     matchLabels:
-      app: disk-pod
+      app: stateful-disk-pod
   serviceName:  stateful-disk-set
   template:
     metadata:
       labels:
-        app: disk-pod
+        app: stateful-disk-pod
     spec:
       containers:
       - name:  busy
-        image: busybox
-        args:
-        - /bin/sh
-        - -c
-        - >
-          i=0;
-          while true;
-          do
-            echo "$i: $(date)" >> /buffer/log.log;
-            i=$((i+1));
-            sleep 1;
-          done
+        image: vplauzon/get-started:part2-no-redis
+        ports:
+        - containerPort: 80
         volumeMounts:
         - name: azure-managed-disk-set
           mountPath: /buffer
