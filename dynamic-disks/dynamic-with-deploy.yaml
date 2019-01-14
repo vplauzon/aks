@@ -34,3 +34,7 @@ spec:
         volumeMounts:
         - name: azure-managed-disk-set
           mountPath: /buffer
+      volumes:
+      - name: volume
+        persistentVolumeClaim:
+          claimName: azure-managed-disk
