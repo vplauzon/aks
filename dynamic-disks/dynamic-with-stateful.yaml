@@ -21,11 +21,11 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: stateful-disk
+        - name: mydisk
           mountPath: /buffer
   volumeClaimTemplates:
   - metadata:
-      name: stateful-disk
+      name: mydisk
     spec:
       storageClassName: managed-premium
       accessModes:
