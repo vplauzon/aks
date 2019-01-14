@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 25Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disk-deploy
+  labels:
+    app: busy-box-with-disk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: disk-pod
+  template:
+    metadata:
+      labels:
+        app: disk-pod
+    spec:
+      containers:
+      - name:  busy
+        image: vplauzon/get-started
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: azure-managed-disk-set
+          mountPath: /buffer
