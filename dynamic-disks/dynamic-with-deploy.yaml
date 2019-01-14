@@ -32,7 +32,7 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: azure-managed-disk-set
+        - name: volume
           mountPath: /buffer
       volumes:
       - name: volume
