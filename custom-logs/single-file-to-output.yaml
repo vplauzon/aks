@@ -13,7 +13,7 @@ spec:
       i=0;
       while true;
       do
-        echo "$i: $(date) dog" > /var/log/mylogs/log.log;
+        echo "$i: $(date) dog" >> /var/log/mylogs/log.log;
         i=$((i+1));
         sleep 1;
       done
