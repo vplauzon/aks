@@ -24,8 +24,8 @@ spec:
     image: busybox
     args: [/bin/sh, -c, 'tail -n+1 -f /var/log/mylogs/log.log']
     volumeMounts:
-    - name: varlog
-      mountPath: /var/log
+    - name: logs
+      mountPath: /var/log/mylogs
   volumes:
   - name: logs
     emptyDir: {}
