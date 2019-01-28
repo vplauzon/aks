@@ -13,8 +13,8 @@ spec:
       i=0;
       while true;
       do
-        echo "$i: $(date)" >> /var/log/1.log;
-        echo "$(date) INFO $i" >> /var/log/2.log;
+        echo "$i: $(date) dog" >> /var/log/1.log;
+        echo "$i: $(date) cat" >> /var/log/2.log;
         i=$((i+1));
         sleep 1;
       done
@@ -23,7 +23,7 @@ spec:
       mountPath: /var/log
   - name:  log-display
     image: busybox
-    args: [/bin/sh, -c, 'tail -n+1 -f /var/log/1.log']
+    args: [/bin/sh, -c, 'tail -n+1 -f /var/log/*.log']
     volumeMounts:
     - name: varlog
       mountPath: /var/log
