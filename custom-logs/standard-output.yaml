@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: standard-output-deploy
+spec:
+  containers:
+  - name: standard-output-pod
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date) dog";
+        i=$((i+1));
+        sleep 1;
+      done
