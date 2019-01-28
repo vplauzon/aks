@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: standard-output-deploy
+  name: standard-output-pod
 spec:
   containers:
-  - name: standard-output-pod
+  - name: main-container
     image: busybox
     args:
     - /bin/sh
