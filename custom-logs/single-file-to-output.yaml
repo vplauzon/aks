@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: single-file-to-output-pod
+spec:
+  containers:
+  - name: main-container
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date) dog" > /var/log/mylogs/log.log;
+        i=$((i+1));
+        sleep 1;
+      done
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log/mylogs
+  - name:  log-display
+    image: busybox
+    args: [/bin/sh, -c, 'tail -n+1 -f /var/log/mylogs/log.log']
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  volumes:
+  - name: logs
+    emptyDir: {}
