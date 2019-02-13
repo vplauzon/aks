@@ -4,7 +4,7 @@ metadata:
   name: test-id-pod
   labels:
     app: little-pod
-      :  little-pod-binding
+    aadpodidbinding:  little-pod-binding
 spec:
   containers:
   - name: main-container
