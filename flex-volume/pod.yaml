@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: main-container
-    image: vplauzon/part2-no-redis
+    image: vplauzon/get-started:part2-no-redis
     volumeMounts:
     - name: secrets
       mountPath: /kvmnt
@@ -18,10 +18,10 @@ spec:
       driver: "azure/kv"
       options:
         usepodidentity: "true"
-        keyvaultname: "vpl-vault"
+        keyvaultname: # Azure Resource name for the Azure Key Vault
         keyvaultobjectnames: myname;myage
         keyvaultobjecttypes: secret;secret # OPTIONS: secret, key, cert
         #keyvaultobjectversions: #  If not provided, take latest
-        resourcegroup: flex
-        subscriptionid: "a9f15356-c7b1-4864-980e-e9bca8b790dd"
-        tenantid: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        resourcegroup: # Resource Group where the Key Vault is
+        subscriptionid: # ID of the subscription where the Key Vault is
+        tenantid: # AAD Tenant ID of the subscription
