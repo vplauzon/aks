@@ -87,7 +87,7 @@
         {
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "cluster",
-            "apiVersion": "2018-03-31",
+            "apiVersion": "2018-08-01-preview",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
