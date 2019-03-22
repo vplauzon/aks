@@ -32,7 +32,7 @@ echo
 echo "Version:  $version"
 
 echo
-echo "Deploying cluster $cluster..."
+echo "Deploying cluster $cluster, VNET, NSG & ACI..."
 
 nrg=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg --template-file deploy.json \
     --parameters \
@@ -47,3 +47,8 @@ nrg=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg --template-file d
 echo
 echo "Successfully deployed cluster $cluster with node resource group in $nsg"
 echo
+
+echo "Connect kubectl to newly created cluster $cluster..."
+echo
+
+ az aks get-credentials -g $rg -n $cluster

@@ -41,7 +41,11 @@
         "VNET Address Space": "172.16.0.0/18",
         "AKS Subnet Address Space": "172.16.0.0/20",
         "Service Subnet Address Space": "172.16.16.0/20",
-        "Service NSG": "serviceNsg",
+        "ACI Subnet Address Space": "172.16.32.0/20",
+        "NSG": "aciNsg",
+        "Network Profile Name": "aci-networkProfile",
+        "Interface Config Name": "eth0",
+        "Interface IP Config": "ipconfigprofile1",
         "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
         "Pod Cidr": "10.16.0.1/16",
         "Cluster-IPs Service Cidr": "10.0.0.0/16",
@@ -54,7 +58,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('Service NSG')]",
+            "name": "[variables('NSG')]",
             "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
             "tags": {},
@@ -131,11 +135,11 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2018-07-01",
             "name": "[variables('VNet Name')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('Service NSG'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -153,15 +157,57 @@
                     {
                         "name": "services",
                         "properties": {
-                            "addressPrefix": "[variables('Service Subnet Address Space')]",
+                            "addressPrefix": "[variables('Service Subnet Address Space')]"
+                        }
+                    },
+                    {
+                        "name": "aci",
+                        "properties": {
+                            "addressPrefix": "[variables('ACI Subnet Address Space')]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('Service NSG'))]"
-                            }
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG'))]"
+                            },
+                            "delegations": [
+                              {
+                                "name": "DelegationService",
+                                "properties": {
+                                  "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                                }
+                              }
+                            ]
                         }
                     }
                 ]
             },
             "resources": []
+        },
+        {
+            "name": "[variables('Network Profile Name')]",
+            "type": "Microsoft.Network/networkProfiles",
+            "apiVersion": "2018-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
+            ],
+            "properties": {
+                "containerNetworkInterfaceConfigurations": [
+                    {
+                        "name": "[variables('Interface Config Name')]",
+                        "properties": {
+                            "ipConfigurations": [
+                                {
+                                    "name": "[variables('Interface IP Config')]",
+                                    "properties": {
+                                        "subnet": {
+                                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VNET Name'), 'aci')]"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
         },
         {
             "type": "Microsoft.Network/virtualNetworks/providers/roleAssignments",
@@ -173,6 +219,42 @@
             "properties": {
                 "roleDefinitionId": "[variables('Network Contributor Role')]",
                 "principalId": "[parameters('principalObjectId')]"
+            }
+        },
+        {
+            "name": "myContainerGroup",
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkProfiles', variables('Network Profile Name'))]"
+            ],
+            "properties": {
+                "containers": [
+                    {
+                        "name": "web-container",
+                        "properties": {
+                            "image": "vplauzon/get-started:part2-no-redis",
+                            "ports": [
+                                {
+                                    "port": "80",
+                                    "protocol": "Tcp"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": "1",
+                                    "memoryInGB": "1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "osType": "Linux",
+                "networkProfile": {
+                    "Id": "[resourceId('Microsoft.Network/networkProfiles', variables('Network Profile Name'))]"
+                },
+                "restartPolicy": "Always"
             }
         },
         {
