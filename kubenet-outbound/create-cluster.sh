@@ -1,8 +1,18 @@
 #!/bin/bash
 
 ##########################################################################
-##  Create an AKS cluster with kubenet network plugin
-##  Also create a VNET with 2 subnets
+##  Creates a VNET with 3 subnets
+##  Deploys an AKS cluster with kubenet network plugin in one subnet
+##  Deploys an Azure Container Instance (ACI) in another subnet
+##
+##  Takes 5 parameters:
+##
+##  1- Name of resource group
+##  2- Azure region name (must be compatible with ACI in VNET regions)
+##  3- Name of cluster
+##  4- Service Principal Application ID
+##  5- Service Principal Object ID
+##  6- Service Principal Password
 
 rg=$1
 region=$2
@@ -34,18 +44,18 @@ echo "Version:  $version"
 echo
 echo "Deploying cluster $cluster, VNET, NSG & ACI..."
 
-nrg=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg --template-file deploy.json \
+ip=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg --template-file deploy.json \
     --parameters \
     version=$version \
     clusterName=$cluster \
     principalAppId=$appId \
     principalObjectId=$appObjectId \
     principalSecret=$appPassword \
-    --query "properties.outputs.nodeResourceGroup.value" \
+    --query "properties.outputs.containerIp.value" \
     -o tsv)
 
 echo
-echo "Successfully deployed cluster $cluster with node resource group in $nsg"
+echo "Successfully deployed cluster $cluster and ACI with IP $ip"
 echo
 
 echo "Connect kubectl to newly created cluster $cluster..."

@@ -47,6 +47,7 @@
         "Interface Config Name": "eth0",
         "Interface IP Config": "ipconfigprofile1",
         "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
+        "Container Group Name": "myContainerGroup",
         "Pod Cidr": "10.16.0.1/16",
         "Cluster-IPs Service Cidr": "10.0.0.0/16",
         "Dns Service IP": "10.0.0.10",
@@ -168,12 +169,12 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('NSG'))]"
                             },
                             "delegations": [
-                              {
-                                "name": "DelegationService",
-                                "properties": {
-                                  "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                                {
+                                    "name": "DelegationService",
+                                    "properties": {
+                                        "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                                    }
                                 }
-                              }
                             ]
                         }
                     }
@@ -222,7 +223,7 @@
             }
         },
         {
-            "name": "myContainerGroup",
+            "name": "[variables('Container Group Name')]",
             "type": "Microsoft.ContainerInstance/containerGroups",
             "apiVersion": "2018-07-01",
             "location": "[resourceGroup().location]",
@@ -308,6 +309,10 @@
         "nodeResourceGroup": {
             "type": "string",
             "value": "[reference(parameters('clusterName')).nodeResourceGroup]"
+        },
+        "containerIp": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups/', variables('Container Group Name'))).ipAddress.ip]"
         }
     }
 }
