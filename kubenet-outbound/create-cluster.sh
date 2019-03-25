@@ -44,7 +44,8 @@ echo "Version:  $version"
 echo
 echo "Deploying cluster $cluster, VNET, NSG & ACI..."
 
-ip=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg --template-file deploy.json \
+ip=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg \
+    --template-file https://raw.githubusercontent.com/vplauzon/aks/master/kubenet-outbound/deploy.json \
     --parameters \
     version=$version \
     clusterName=$cluster \
