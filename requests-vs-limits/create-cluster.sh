@@ -14,6 +14,9 @@
 ##  5- Service Principal Object ID
 ##  6- Service Principal Password
 
+#   Make sure the script fails if any subcommand fail
+set -e
+
 rg=$1
 region=$2
 cluster=$3
@@ -61,16 +64,21 @@ echo "Successfully deployed cluster $cluster"
 echo
 echo "Looking for Route table in $nrg..."
 
-routeTableId=$(az network route-table list -g $nrg --query "[0].id")
+routeTableId=$(az network route-table list -g $nrg --query "[0].id" -o tsv)
 
 echo
 echo "Looking for Virtual Network in $rg..."
 
-vnetId=$(az network vnet list -g $rg --query "[0].id")
+vnet=$(az network vnet list -g $rg --query "[0].name" -o tsv)
 
 echo
-echo "Connection route table $routeTableId in Virtual Network $vnetId..."
+echo "Connection route table $routeTableId in Virtual Network $vnet..."
 
+#   Run two commands (for 2 subnets) in parallel, i.e. fork and join
+az network vnet subnet update -g $rg -n aks --vnet-name $vnet --route-table $routeTableId
+az network vnet subnet update -g $rg -n services --vnet-name $vnet --route-table $routeTableId
+
+echo
 echo "Connect kubectl to newly created cluster $cluster..."
 echo
 
