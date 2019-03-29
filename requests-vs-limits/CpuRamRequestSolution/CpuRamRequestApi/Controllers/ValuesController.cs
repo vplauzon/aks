@@ -55,6 +55,13 @@ namespace CpuRamRequestApi.Controllers
                     exceptions = messages.ToArray()
                 };
             }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    exception = ex.Message
+                };
+            }
         }
 
         private void BusyWork(int ram, CancellationToken cancellationToken)
