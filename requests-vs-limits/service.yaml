@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: vplauzon/cpu-ram-request-api:2
+        image: vplauzon/cpu-ram-request-api:3
         ports:
         - containerPort: 80
         resources:

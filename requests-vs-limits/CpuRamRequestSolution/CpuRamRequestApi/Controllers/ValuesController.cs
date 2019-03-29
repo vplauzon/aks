@@ -19,22 +19,22 @@ namespace CpuRamRequestApi.Controllers
             [FromQuery]int core = 1,
             [FromQuery]int ram = 10)
         {
-            core = Math.Max(core, 1);
-            core = Math.Min(core, 256);
-            ram = Math.Max(1, ram);
-            ram = Math.Min(10000, ram);
-            duration = Math.Max(duration, 1);
-            duration = Math.Min(duration, 300);
-
-            var source = new CancellationTokenSource(TimeSpan.FromSeconds(duration));
-            var cancellationToken = source.Token;
-            var stopWatch = Stopwatch.StartNew();
-            var tasks = (from i in Enumerable.Range(0, core)
-                         let task = Task.Run(() => BusyWork(ram, cancellationToken), cancellationToken)
-                         select task).ToArray();
-
             try
             {
+                core = Math.Max(core, 1);
+                core = Math.Min(core, 256);
+                ram = Math.Max(1, ram);
+                ram = Math.Min(10000, ram);
+                duration = Math.Max(duration, 1);
+                duration = Math.Min(duration, 300);
+
+                var source = new CancellationTokenSource(TimeSpan.FromSeconds(duration));
+                var cancellationToken = source.Token;
+                var stopWatch = Stopwatch.StartNew();
+                var tasks = (from i in Enumerable.Range(0, core)
+                             let task = Task.Run(() => BusyWork(ram, cancellationToken), cancellationToken)
+                             select task).ToArray();
+
                 await Task.WhenAll(tasks);
 
                 return new
