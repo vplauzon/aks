@@ -9,10 +9,11 @@
 ##
 ##  1- Name of resource group
 ##  2- Azure region name (must be compatible with ACI in VNET regions)
-##  3- Name of cluster
-##  4- Service Principal Application ID
-##  5- Service Principal Object ID
-##  6- Service Principal Password
+##  3- Name of Log Analytics workspace
+##  4- Name of AKS cluster
+##  5- Service Principal Application ID
+##  6- Service Principal Object ID
+##  7- Service Principal Password
 
 #   Make sure the script fails if any subcommand fail
 set -e
@@ -47,7 +48,7 @@ echo
 echo "Version:  $version"
 
 echo
-echo "Deploying cluster $cluster, Log Analytics, VNET & NSG..."
+echo "Deploying cluster $cluster, Log Analytics workspace, VNET & NSG..."
 
 nrg=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg \
     --template-file deploy.json \
