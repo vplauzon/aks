@@ -12,9 +12,17 @@ namespace CpuRamRequestApi.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<object> Get(
+            [FromQuery]int duration = 30,
+            [FromQuery]int core = 1,
+            [FromQuery]int ram = 10)
         {
-            return new string[] { "value1", "value2" };
+            return new
+            {
+                duration = duration,
+                numberOfCore = core,
+                ram = ram
+            };
         }
     }
 }
