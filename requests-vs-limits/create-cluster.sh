@@ -19,13 +19,15 @@ set -e
 
 rg=$1
 region=$2
-cluster=$3
-appId=$4
-appObjectId=$5
-appPassword=$6
+workspace=$3
+cluster=$4
+appId=$5
+appObjectId=$6
+appPassword=$7
 
 echo "Resource group:  $rg"
 echo "Region:  $region"
+echo "Workspace name:  $workspace"
 echo "Cluster name:  $cluster"
 echo "Application ID:  $appId"
 echo "Application Object ID:  $appObjectId"
@@ -45,12 +47,13 @@ echo
 echo "Version:  $version"
 
 echo
-echo "Deploying cluster $cluster, VNET & NSG..."
+echo "Deploying cluster $cluster, Log Analytics, VNET & NSG..."
 
 nrg=$(az group deployment create -n "deploy-$(uuidgen)" -g $rg \
     --template-file deploy.json \
     --parameters \
     version=$version \
+    workspaceName=$workspace \
     clusterName=$cluster \
     principalAppId=$appId \
     principalObjectId=$appObjectId \

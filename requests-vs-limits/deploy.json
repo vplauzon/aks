@@ -9,6 +9,12 @@
             "type": "string",
             "defaultValue": "1.12.6"
         },
+        "workspaceName": {
+            "metadata": {
+                "description": "Name of the Log Analytics workspace"
+            },
+            "type": "string"
+        },
         "clusterName": {
             "metadata": {
                 "description": "Name of the cluster (and DNS Prefix)"
@@ -52,6 +58,18 @@
         "ssh public key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/DWLnsCzgNo4rXoafDwXRjXBCIyX8m6sPJRVfDSmYgND739wQsfBF/B8RCyU1z+tjmOr+CZYCu6w2FmVL8JDY/aPJC9nDtO5aZSZtAdKJH51PwODsI8E4mthPuC01CxRageEDeEW9u4CCu3HXq6gFBscOEsC1iTYO5gsaxotiGdJS2pYnNHDVTWqhbzi7UPx8xPKJ1M8LKkG2paZLYBHKIhjrxjrAjnnsLkFb/dhfdr9D65Mqf5OGy40X1vQv+rfbLtnpb1DMajlfwQtBQpHY2SnEFbSwQva/l/chyhc4b854Uhpc1XdkIcQYiz7pRagRsJ1u5lMusCAsE5gnGoEJ vplauzon@MININT-BK6A5VR"
     },
     "resources": [
+        {
+            "type": "microsoft.operationalinsights/workspaces",
+            "name": "[parameters('workspaceName')]",
+            "apiVersion": "2015-11-01-preview",
+            "location": "canadacentral",
+            "properties": {
+                "sku": {
+                    "name": "pergb2018"
+                }
+            },
+            "dependsOn": []
+        },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "[variables('NSG')]",
@@ -126,15 +144,23 @@
         {
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "[parameters('clusterName')]",
-            "apiVersion": "2018-03-31",
+            "apiVersion": "2019-02-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]",
+                "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]"
             ],
             "properties": {
                 "kubernetesVersion": "[parameters('version')]",
                 "dnsPrefix": "[parameters('clusterName')]",
-                "addonProfiles": {},
+                "addonProfiles": {
+                    "omsagent": {
+                        "enabled": true,
+                        "config": {
+                            "logAnalyticsWorkspaceResourceID": "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]"
+                        }
+                    }
+                },
                 "servicePrincipalProfile": {
                     "clientId": "[parameters('principalAppId')]",
                     "secret": "[parameters('principalSecret')]"

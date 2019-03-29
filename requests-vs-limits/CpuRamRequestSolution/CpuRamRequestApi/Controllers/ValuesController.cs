@@ -33,15 +33,28 @@ namespace CpuRamRequestApi.Controllers
                          let task = Task.Run(() => BusyWork(ram, cancellationToken), cancellationToken)
                          select task).ToArray();
 
-            await Task.WhenAll(tasks);
-
-            return new
+            try
             {
-                duration = duration,
-                numberOfCore = core,
-                ram = ram,
-                realDuration = stopWatch.Elapsed
-            };
+                await Task.WhenAll(tasks);
+
+                return new
+                {
+                    duration = duration,
+                    numberOfCore = core,
+                    ram = ram,
+                    realDuration = stopWatch.Elapsed
+                };
+            }
+            catch (AggregateException ex)
+            {
+                var messages = from e in ex.InnerExceptions
+                               select e.Message;
+
+                return new
+                {
+                    exceptions = messages.ToArray()
+                };
+            }
         }
 
         private void BusyWork(int ram, CancellationToken cancellationToken)
