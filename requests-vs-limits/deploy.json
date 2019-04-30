@@ -41,7 +41,7 @@
         }
     },
     "variables": {
-        "Max Pods": 200,
+        "Max Pods": 32,
         "Network Contributor Role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
         "VNET Name": "cluster-vnet",
         "VNET Address Space": "172.16.0.0/18",
