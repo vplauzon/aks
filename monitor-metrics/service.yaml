@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-ram-api
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app:  cpu-ram-api
+  template:
+    metadata:
+      labels:
+        app: cpu-ram-api
+    spec:
+      containers:
+      - name: cpu-ram-request-api
+        image: vplauzon/cpu-ram-request-api:4
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64M"
+            cpu: "250m"
+          limits:
+            memory: "128M"
+            cpu: "2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpu-ram-request-api-svc
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: cpu-ram-api
+  
