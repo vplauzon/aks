@@ -41,7 +41,7 @@
         }
     },
     "variables": {
-        "Max Pods": 200,
+        "Max Pods": 32,
         "Network Contributor Role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
         "VNET Name": "cluster-vnet",
         "VNET Address Space": "172.16.0.0/18",
@@ -49,7 +49,7 @@
         "Service Subnet Address Space": "172.16.16.0/20",
         "NSG": "servicesNsg",
         "Role Assignment Name": "[concat(variables('VNET Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Network Contributor Role')))]",
-        "Pod Cidr": "10.16.0.1/16",
+        "Pod Cidr": "10.16.0.0/16",
         "Cluster-IPs Service Cidr": "10.0.0.0/16",
         "Dns Service IP": "10.0.0.10",
         "Docker Bridge Cidr": "10.2.0.1/16",
