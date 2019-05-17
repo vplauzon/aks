@@ -65,7 +65,7 @@
             "location": "canadacentral",
             "properties": {
                 "sku": {
-                    "name": "pergb2018"
+                    "name": "PerGB2018"
                 }
             },
             "dependsOn": []
