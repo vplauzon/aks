@@ -185,7 +185,7 @@
         {
             "name": "[variables('Network Profile Name')]",
             "type": "Microsoft.Network/networkProfiles",
-            "apiVersion": "2018-07-01",
+            "apiVersion": "2019-04-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('VNET Name'))]"
