@@ -14,4 +14,4 @@ spec:
         - backend:
             serviceName: aks-helloworld-two
             servicePort: 80
-          path: /hello-world-2(/|$)(.*)
+          path: /hello-world-2
